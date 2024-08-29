@@ -7,6 +7,11 @@ import net from "./node_modules/index.js"
 // b) Arme un grupo de maquinas (de tres nodos), asigne direcciones de grupo a cada nodo y envíe un
 // mensaje al grupo. El mensaje puede ser simplemente un número entero o una cadena de caracteres.
 // c) utilice una Cuarta Computadora para enviar mensajes desde el exterior al grupo.
+
+
+// TODO: // Hacer que el cliente se comunique con el servidor de grupos y le pase el nombre del grupo al que se quiere conectar. Este servidor le envia la direccion y puerto conocido del coordinador del grupo con el que se quiere comunicar. 
+// El cliente luego le envia el mensaje al coordinador del grupo y el coordinador del grupo lo multicastea a cada uno de los grupos.
+
 function multicast(message) {
   clients.forEach((client) => {
     client.write(message + '\n');  // El delimitador sirve para la atomicidad y para que el servidor pueda leer los mensajes
@@ -36,9 +41,12 @@ clientsWithGroups.set(clients[2], 1);
 const coordinator = net.createServer((socket) => {
   socket.on("data", (data) => {
     const message = readBytes(data, 0, data.length);
-    // obtiene el grupo del cliente
+    // Aqui deberia detectar el grupo al que se quiere comunicar el cliente
     const group = message[0]
-    
+
+    // luego deberia obtener el mensaje como tal que se quiere enviar a  cada miembro del grupo
+
+    // enviar el mensaje solo a esos elementos del grupo
     multicast(message); // Reenvía el mensaje al grupo
   });
 });
