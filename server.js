@@ -1,4 +1,4 @@
-import net from "./node_modules/index.js"
+import net from "net";
 
 // a) Utilizando sockets programe un sistema de comunicación multicast y tenga en cuenta las siguientes
 // características:
@@ -12,31 +12,17 @@ import net from "./node_modules/index.js"
 // TODO: // Hacer que el cliente se comunique con el servidor de grupos y le pase el nombre del grupo al que se quiere conectar. Este servidor le envia la direccion y puerto conocido del coordinador del grupo con el que se quiere comunicar. 
 // El cliente luego le envia el mensaje al coordinador del grupo y el coordinador del grupo lo multicastea a cada uno de los grupos.
 
+const clients = [];
+
 function multicast(message) {
   clients.forEach((client) => {
-    client.write(message + '\n');  // El delimitador sirve para la atomicidad y para que el servidor pueda leer los mensajes
+    client.write(message); 
   });
 }
 
 function readBytes (buffer, offset, length) {
   return buffer.slice(offset, offset + length)
 }
-
-const externalMessages = [];
-const clients = [
-  net.createConnection({ port: 59092 }),
-  net.createConnection({ port: 59093 }),
-  net.createConnection({ port: 59094 }),
-];
-
-// Mapa de clientes con sus respectivos grupos
-const clientsWithGroups = new Map();
-
-// Asignación de grupos
-clientsWithGroups.set(clients[0], 1);
-clientsWithGroups.set(clients[1], 2);
-clientsWithGroups.set(clients[2], 1);
-
 // Nodo coordinador central
 const coordinator = net.createServer((socket) => {
   socket.on("data", (data) => {
@@ -53,13 +39,26 @@ const coordinator = net.createServer((socket) => {
 
 coordinator.listen(59091, '127.0.0.1');  // Escucha conexiones externas en otro puerto
 
+// Asigno un grupo random del 1 al 3 a cada cliente que llega y lo empujo a la lista de clientes
+function assignGroup(socket) {
+  const group = Math.floor(Math.random() * 3) + 1;
+  socket.write(group.toString()+"\n");
+}
+
+
 // Servidor multicast
 const server = net.createServer((socket) => {
   clients.push(socket);
+  console.log("New client on port ", socket.remotePort);
+  console.log(socket)
 
   socket.on("data", (data) => {
+    console.log(data)
     const message = readBytes(data, 0, data.length);
-    multicast(message, socket);  // Reenvía el mensaje al grupo
+    // multicast(message, socket);  // Reenvía el mensaje al grupo
+      console.log(message.toString("utf-8"))
+      assignGroup(socket);
+      socket.write(`Estas conectado junto a ${clients.length} clientes: ${clients.map((client) => JSON.stringify({"dir":client.localAddress, "port":client.remotePort}))} ${"\n"}`);
   });
 
   socket.on("end", () => {
