@@ -1,4 +1,5 @@
 import net from "net";
+import { readBytes, groupAmount } from "./auxiliares.js";
 
 // a) Utilizando sockets programe un sistema de comunicación multicast y tenga en cuenta las siguientes
 // características:
@@ -12,19 +13,15 @@ import net from "net";
 // TODO: // Hacer que el cliente se comunique con el servidor de grupos y le pase el nombre del grupo al que se quiere conectar. Este servidor le envia la direccion y puerto conocido del coordinador del grupo con el que se quiere comunicar. 
 // El cliente luego le envia el mensaje al coordinador del grupo y el coordinador del grupo lo multicastea a cada uno de los grupos.
 
-const groupAmount = 3; // Cantidad de grupos
 const clientsGroups = new Map(); // Mapa de grupos con sus respectivos clientes
 const coordinators = []; // Lista de servidores (coordinadores) para cada grupo
 
 function multicast(group, message) {
   const clients = clientsGroups.get(group) || [];
+  console.log(`Enviando mensaje a ${clients.length} clientes del grupo ${group}`);
   clients.forEach((client) => {
     client.write(message); 
   });
-}
-
-function readBytes(buffer, offset, length) {
-  return buffer.slice(offset, offset + length);
 }
 
 // Crea un coordinador de grupo
@@ -35,6 +32,9 @@ function createCoordinator(group, port) {
 
       // Enviar el mensaje solo a esos elementos del grupo
       multicast(group, message);
+
+      // Confirma con el ACK que se envio correctamente
+      socket.end('Mensaje enviado al grupo '+group.toString());
     });
 
     socket.on("end", () => {
@@ -48,6 +48,7 @@ function createCoordinator(group, port) {
 
     socket.on("error", (err) => {
       console.error("Socket error:", err);
+      socket.end('Error al enviar mensaje al grupo '+group.toString());
     });
   });
 
@@ -75,11 +76,7 @@ function assignGroup(socket) {
 }
 
 // Servidor de grupos
-const server = net.createServer((socket) => {
-  console.log("New client on port ", socket.remotePort);
-  // Le asigna un grupo al cliente
-  assignGroup(socket);
-
+const groupServer = net.createServer((socket) => {
   // El servidor de grupos recibira el numero de grupo al que se quiere conectar el cliente y le enviara la direccion y puerto del coordinador de ese grupo para que se conecte a el.
   socket.on("data", (data) => {
     console.log(data)
@@ -89,13 +86,15 @@ const server = net.createServer((socket) => {
     console.log(group);
 
     if (isNaN(Number(group)) || group < 1 || group > groupAmount) {
-      socket.write("Grupo no valido");
+      socket.end(`Grupo no valido, grupos disponibles del 1 al ${groupAmount}`);
       return;
     }
 
     const coordinator = coordinators[group - 1]; // Recupera el coordinador del grupo
     const address = coordinator.address();
-    socket.write(`${address.address}:${address.port}`);
+
+    // Envia la direccion y puerto del coordinador de grupos al cliente
+    socket.end(JSON.stringify({"address":address.address,"port":address.port}));
   });
 
   socket.on("end", () => {
@@ -103,4 +102,13 @@ const server = net.createServer((socket) => {
   });
 });
 
-server.listen(8080);
+groupServer.listen(8080);
+
+const serverGroupAssignator = net.createServer((socket) => {
+  console.log("New client on port ", socket.remotePort);
+
+  // Asignar un grupo al cliente
+  assignGroup(socket);
+});
+
+serverGroupAssignator.listen(8888);
