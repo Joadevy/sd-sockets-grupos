@@ -9,10 +9,6 @@ import { readBytes, groupAmount } from "./auxiliares.js";
 // mensaje al grupo. El mensaje puede ser simplemente un número entero o una cadena de caracteres.
 // c) utilice una Cuarta Computadora para enviar mensajes desde el exterior al grupo.
 
-
-// TODO: // Hacer que el cliente se comunique con el servidor de grupos y le pase el nombre del grupo al que se quiere conectar. Este servidor le envia la direccion y puerto conocido del coordinador del grupo con el que se quiere comunicar. 
-// El cliente luego le envia el mensaje al coordinador del grupo y el coordinador del grupo lo multicastea a cada uno de los grupos.
-
 const clientsGroups = new Map(); // Mapa de grupos con sus respectivos clientes
 const coordinators = []; // Lista de servidores (coordinadores) para cada grupo
 
