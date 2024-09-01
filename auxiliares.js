@@ -12,3 +12,7 @@ export function isValidJson(jsonString) {
 export function readBytes(buffer, offset, length) {
   return buffer.slice(offset, offset + length);
 }
+
+export function isValidGroupNumber (groupNumber) {
+  return !isNaN(Number(groupNumber)) && groupNumber >= 1 && groupNumber <= groupAmount;
+}

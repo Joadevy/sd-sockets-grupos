@@ -58,8 +58,10 @@ function createCoordinator(group, port) {
           return;
         }
 
-        socket.end('Mensaje enviado al grupo '+group.toString())
+        socket.write('Mensaje enviado al grupo '+group.toString())
       });
+    } else if (message === "CLOSE"){
+      socket.end('Desconectado del coordinador '+group.toString());
     }
   });
 
