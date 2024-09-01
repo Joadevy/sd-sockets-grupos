@@ -1,7 +1,7 @@
 import net from "net"
 import { isValidJson, groupAmount } from "./auxiliares.js";
 
-const messageToGroup = (groupNumber) => `Hola grupo ${groupNumber}!`
+const messageToGroup = (groupNumber) => `SENDHola grupo ${groupNumber}!`
 // Se conectara a un grupo random del 1 al groupAmount
 const groupToConnect = Math.floor(Math.random() * groupAmount) + 1;
 
@@ -37,7 +37,7 @@ client.on("data", (data) => {
   // Conectarse al coordinador de grupos que devolvio el servidor de grupos
   const coordinator = new net.Socket()
   coordinator.connect({ port: Number(port), host: ipAddress }, () => {
-    console.log(`Connected to coordinator ${address}:${port}`)
+    console.log(`Conectado al coordinador del grupo ${groupToConnect} en ${address}:${port}`)
     coordinator.write(messageToGroup(groupToConnect))
   })
 
