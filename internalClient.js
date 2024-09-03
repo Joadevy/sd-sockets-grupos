@@ -1,4 +1,4 @@
-import net from "net"
+import net from "node:net"
 import { isValidJson } from "./auxiliares.js";
 
 const asignationServer = new net.Socket()
@@ -20,7 +20,6 @@ asignationServer.connect({ port: 8888, host: process.argv[2] ?? "localhost" }, (
     }
 
     const {address, port} = JSON.parse(msgFromAsignation); // Porque viene en formato {"address":<address>,"port":<port>}
-    console.log(`Direccion: ${address}, Puerto: ${port}`);
 
     // Ajustar la dirección si es "::" a "::1" para conexiones locales
     const ipAddress = address === '::' ? '::1' : address;

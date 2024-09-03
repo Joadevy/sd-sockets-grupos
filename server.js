@@ -1,4 +1,4 @@
-import net from "net";
+import net from "node:net";
 import { readBytes, groupAmount } from "./auxiliares.js";
 
 const clientsGroups = new Map(); // Mapa de grupos con sus respectivos clientes, formato numero de grupo -> lista de clientes (array)

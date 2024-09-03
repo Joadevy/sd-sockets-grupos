@@ -1,4 +1,4 @@
-import net from "net"
+import net from "node:net"
 import { isValidJson, groupAmount, isValidGroupNumber} from "./auxiliares.js";
 import readline from "readline";
 
