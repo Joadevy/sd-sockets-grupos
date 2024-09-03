@@ -22,3 +22,21 @@ Proceso que se conectara con el coordinar para ser parte de un grupo y recibira 
 
 ### Cliente externo
 Proceso que se conectara, en primera instancia con el servidor de grupos, luego al coordinador de grupos y enviara mensajes a los miembros de un grupo.
+
+
+## Como ejecutar
+Esta pensado para ejecutar directamente en la terminal usando node o el equivalente en el entorno de ejecucion de javascript de preferencia (se utilizo bun particularmente). se propone una "interactividad" en el cliente externo donde podra elegir a que grupo enviar y el contenido de los mensajes.
+
+1. En la primera terminal, ejecuta el servidor:
+   ```bash
+   node server.js
+   ```
+2. En la segunda terminal, ejecuta un cliente interno, que sera una aplicacion que sera asignada a un grupo, y la aplicacion se conectara e su coordinado de grupo asignado. Esto puede repetirse tantas veces como aplicaciones en grupos desee tener.
+    ```bash
+   node internalClient.js
+   ```
+3. En la tercera terminal, ejecuta un cliente externo, esta sera una aplicacion externa que se querra comunicar con algun grupo para enviarle un mensaje a todos los procesos miembros del grupo.
+   ```bash
+   node externalClient.js
+   ```
+
